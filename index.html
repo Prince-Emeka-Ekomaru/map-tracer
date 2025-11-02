@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Area of Interest Map Tracer</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🗺️ Area of Interest Map Tracer</h1>
+            <p>Mark or trace areas to zoom and focus on specific regions</p>
+        </header>
+
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="search-input"
+                    placeholder="🔍 Search for a location (e.g., New York, Paris, Tokyo...)" />
+                <button id="search-btn" class="btn btn-primary">Search</button>
+                <div id="search-results" class="search-results"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <button id="draw-marker" class="btn btn-primary" title="Add Marker">
+                    📍 Add Marker
+                </button>
+                <button id="draw-polyline" class="btn btn-primary" title="Draw Line">
+                    📏 Draw Line
+                </button>
+                <button id="draw-polygon" class="btn btn-primary" title="Trace Area">
+                    🔲 Trace Area
+                </button>
+                <button id="draw-rectangle" class="btn btn-primary" title="Draw Rectangle">
+                    ⬜ Draw Rectangle
+                </button>
+                <button id="draw-circle" class="btn btn-primary" title="Draw Circle">
+                    ⭕ Draw Circle
+                </button>
+            </div>
+            <div class="control-group">
+                <button id="zoom-to-area" class="btn btn-success" title="Zoom to Selected Area">
+                    🔍 Zoom to Area
+                </button>
+                <button id="delete-selected" class="btn btn-warning" title="Delete Selected" style="display: none;">
+                    🗑️ Delete Selected
+                </button>
+                <button id="clear-all" class="btn btn-danger" title="Clear All">
+                    🗑️ Clear All
+                </button>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <div id="area-info">
+                <strong>Instructions:</strong>
+                <ul>
+                    <li>Use the search box above to find and zoom to locations</li>
+                    <li>Click a drawing tool above to start marking</li>
+                    <li>Draw on the map to create markers, lines, or shapes</li>
+                    <li>All drawings are saved automatically and persist across page refreshes</li>
+                    <li>Select a drawn area and click "Zoom to Area" to focus</li>
+                    <li>Click "Delete Selected" to remove a specific drawing</li>
+                    <li>Double-click to finish drawing polygons/lines</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <span class="legend-color" style="background: #3388ff;"></span>
+                <span>Drawn Areas</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-color" style="background: #ff7800;"></span>
+                <span>Selected Area</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+
+    <!-- Custom JS -->
+    <script src="app.js"></script>
+</body>
+
+</html>
