@@ -195,6 +195,15 @@ header p {
     background: #059669;
 }
 
+.btn-info {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-info:hover {
+    background: #2563eb;
+}
+
 .btn-warning {
     background: #f59e0b;
     color: white;

@@ -165,6 +165,10 @@ document.getElementById('delete-selected').addEventListener('click', () => {
     deleteSelected();
 });
 
+document.getElementById('download-data').addEventListener('click', () => {
+    downloadDrawings();
+});
+
 // Activate a draw control
 function activateDrawControl(type) {
     // Deactivate current control
@@ -389,6 +393,101 @@ function calculatePolylineDistance(polyline) {
     }
     
     return totalDistance;
+}
+
+// Download drawings as GeoJSON file
+function downloadDrawings() {
+    if (drawnFeatures.length === 0) {
+        alert('No drawings to download. Please draw something on the map first.');
+        return;
+    }
+    
+    try {
+        const features = [];
+        drawnFeatures.forEach((layer, index) => {
+            let feature;
+            
+            // Handle circles specially (GeoJSON doesn't support circles natively)
+            if (layer instanceof L.Circle) {
+                const center = layer.getLatLng();
+                const radius = layer.getRadius();
+                // Convert circle to a polygon approximation for GeoJSON compatibility
+                const circlePoints = [];
+                const numPoints = 64; // Number of points to approximate the circle
+                for (let i = 0; i < numPoints; i++) {
+                    const angle = (i / numPoints) * 2 * Math.PI;
+                    const lat = center.lat + (radius / 111320) * Math.cos(angle);
+                    const lng = center.lng + (radius / (111320 * Math.cos(center.lat * Math.PI / 180))) * Math.sin(angle);
+                    circlePoints.push([lng, lat]);
+                }
+                // Close the circle
+                circlePoints.push(circlePoints[0]);
+                
+                feature = {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [circlePoints]
+                    },
+                    properties: {
+                        type: 'Circle',
+                        centerLat: center.lat,
+                        centerLng: center.lng,
+                        radius: radius,
+                        name: `Circle ${index + 1}`
+                    }
+                };
+            } else {
+                // Convert layer to GeoJSON
+                feature = layer.toGeoJSON();
+                
+                // Add metadata
+                if (!feature.properties) {
+                    feature.properties = {};
+                }
+                feature.properties.name = `${getFeatureType(layer)} ${index + 1}`;
+                feature.properties.type = getFeatureType(layer);
+            }
+            
+            // Add ID if available
+            if (layer.feature?.id) {
+                feature.id = layer.feature.id;
+                feature.properties.id = layer.feature.id;
+            }
+            
+            features.push(feature);
+        });
+        
+        // Create GeoJSON FeatureCollection
+        const geoJson = {
+            type: 'FeatureCollection',
+            features: features,
+            metadata: {
+                exported: new Date().toISOString(),
+                totalFeatures: features.length,
+                application: 'Map Area Tracer'
+            }
+        };
+        
+        // Convert to JSON string with pretty formatting
+        const jsonString = JSON.stringify(geoJson, null, 2);
+        
+        // Create blob and download
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `map-drawings-${new Date().toISOString().split('T')[0]}.geojson`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        updateAreaInfo(`Downloaded ${features.length} drawing(s) as GeoJSON file.`);
+    } catch (error) {
+        console.error('Error downloading drawings:', error);
+        alert('Error downloading drawings. Please try again.');
+    }
 }
 
 // Save drawn features to localStorage
